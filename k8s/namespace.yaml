@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-im
+  labels:
+    project: presales-landing-zone
+    demo: im-demo

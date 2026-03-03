@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: im-demo-nb
+  namespace: demo-im
+  labels:
+    app: im-demo
+  annotations:
+    service.beta.kubernetes.io/linode-loadbalancer-throttle: "0"
+spec:
+  type: LoadBalancer
+  selector:
+    app: im-demo
+  ports:
+    - name: https
+      port: 443
+      targetPort: 3001
+      protocol: TCP

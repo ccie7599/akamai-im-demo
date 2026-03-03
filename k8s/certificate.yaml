@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: origin-im-demo-tls
+  namespace: demo-im
+  labels:
+    app: im-demo
+    project: presales-landing-zone
+spec:
+  secretName: origin-im-demo-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - origin-im-demo.connected-cloud.io
