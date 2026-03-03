@@ -13,7 +13,7 @@ variable "group_id" {
 }
 
 variable "product_id" {
-  description = "Akamai product ID (Ion Standard)"
+  description = "Akamai product ID (Ion Premier)"
   type        = string
   default     = "prd_SPM"
 }
@@ -94,6 +94,18 @@ variable "edgeworker_resource_tier_id" {
 variable "origin_ip" {
   description = "Origin server IP address for DNS A record"
   type        = string
+}
+
+variable "origin_basic_auth_b64" {
+  description = "Base64-encoded origin Basic Auth credentials (e.g. base64('user:pass'))"
+  type        = string
+  sensitive   = true
+}
+
+variable "site_basic_auth_b64" {
+  description = "Base64-encoded site Basic Auth credentials for edge authentication (e.g. base64('user:pass'))"
+  type        = string
+  sensitive   = true
 }
 
 variable "debug_key" {

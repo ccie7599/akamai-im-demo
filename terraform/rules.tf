@@ -125,6 +125,7 @@ data "akamai_property_rules_builder" "default_rule" {
     }
 
     children = [
+      data.akamai_property_rules_builder.site_auth.json,
       data.akamai_property_rules_builder.augment_insights.json,
       data.akamai_property_rules_builder.accelerate_delivery.json,
       data.akamai_property_rules_builder.offload_origin.json,
@@ -132,6 +133,43 @@ data "akamai_property_rules_builder" "default_rule" {
       data.akamai_property_rules_builder.images.json,
       data.akamai_property_rules_builder.api_passthrough.json,
     ]
+  }
+}
+
+# ===== SITE AUTHENTICATION (HTTP Basic Auth at edge) =====
+data "akamai_property_rules_builder" "site_auth" {
+  rules_v2025_10_16 {
+    name     = "Site authentication"
+    comments = "HTTP Basic Auth — deny requests without valid credentials"
+
+    criterion {
+      request_header {
+        header_name          = "Authorization"
+        match_operator       = "IS_NOT_ONE_OF"
+        values               = ["Basic ${var.site_basic_auth_b64}"]
+        match_wildcard_name  = false
+        match_wildcard_value = false
+      }
+    }
+
+    behavior {
+      construct_response {
+        enabled       = true
+        response_code = 401
+        body          = "Unauthorized"
+        force_eviction = false
+      }
+    }
+
+    behavior {
+      modify_outgoing_response_header {
+        action                   = "ADD"
+        standard_add_header_name = "OTHER"
+        custom_header_name       = "WWW-Authenticate"
+        header_value             = "Basic realm=\"Presales Demo\""
+        avoid_duplicate_headers  = true
+      }
+    }
   }
 }
 
@@ -537,6 +575,10 @@ data "akamai_property_rules_builder" "images" {
       }
     }
 
+    # Origin protected by Origin IP ACL + site basic auth at edge.
+    # No need for separate origin basic auth headers — removed to
+    # avoid interfering with requestHeader criterion in site_auth rule.
+
     behavior {
       caching {
         behavior        = "MAX_AGE"
@@ -600,6 +642,8 @@ data "akamai_property_rules_builder" "api_passthrough" {
         values               = ["/api/*", "/socket.io/*"]
       }
     }
+
+    # Origin protected by Origin IP ACL + site basic auth at edge.
 
     behavior {
       caching {
