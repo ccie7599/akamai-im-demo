@@ -7,6 +7,8 @@ metadata:
     app: im-demo
   annotations:
     service.beta.kubernetes.io/linode-loadbalancer-throttle: "0"
+    service.beta.kubernetes.io/linode-loadbalancer-default-protocol: https
+    service.beta.kubernetes.io/linode-loadbalancer-port-443: '{"tls-secret-name": "origin-im-demo-tls", "protocol": "https"}'
 spec:
   type: LoadBalancer
   selector:
