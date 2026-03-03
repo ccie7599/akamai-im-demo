@@ -37,7 +37,7 @@ spec:
         - name: harbor-creds
       containers:
         - name: im-demo
-          image: harbor.harbor.svc.cluster.local/presales/im-demo:v3
+          image: harbor.harbor.svc.cluster.local/presales/im-demo:v4
           command: ["/bin/sh", "-c"]
           args: [". /vault/secrets/config && exec node dist/index.js"]
           ports:
