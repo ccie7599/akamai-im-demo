@@ -24,6 +24,7 @@ spec:
           export API_AUTH_TOKEN={{ .Data.data.API_AUTH_TOKEN }}
           export DS2_WEBHOOK_USERNAME={{ .Data.data.DS2_WEBHOOK_USERNAME }}
           export DS2_WEBHOOK_PASSWORD={{ .Data.data.DS2_WEBHOOK_PASSWORD }}
+          export SITE_AUTH_B64={{ .Data.data.SITE_AUTH_B64 }}
           {{- end }}
         vault.hashicorp.com/agent-inject-secret-edgerc: "api/data/im-demo/edgerc"
         vault.hashicorp.com/agent-inject-template-edgerc: |
@@ -36,7 +37,7 @@ spec:
         - name: harbor-creds
       containers:
         - name: im-demo
-          image: harbor.harbor.svc.cluster.local/presales/im-demo:v2
+          image: harbor.harbor.svc.cluster.local/presales/im-demo:v3
           command: ["/bin/sh", "-c"]
           args: [". /vault/secrets/config && exec node dist/index.js"]
           ports:

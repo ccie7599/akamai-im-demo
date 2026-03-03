@@ -40,6 +40,9 @@ COPY --from=server-build /app/server/dist ./server/dist
 # Frontend build output
 COPY --from=frontend-build /app/dist ./dist
 
+# EdgeWorker source (displayed in Edge Logic section)
+COPY edgeworker/ ./edgeworker/
+
 ENV PORT=3001
 ENV NODE_ENV=production
 EXPOSE 3001

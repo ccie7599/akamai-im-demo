@@ -7,5 +7,5 @@ server/dist
 .git
 deploy
 terraform
-edgeworker
+edgeworker/*.tgz
 *.md

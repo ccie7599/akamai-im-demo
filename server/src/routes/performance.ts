@@ -1,4 +1,10 @@
 import { Router, type Request, type Response } from "express"
+import { Agent } from "undici"
+import { config } from "../config.js"
+
+// Probe agent skips TLS verification — the probe measures edge delivery
+// performance against Akamai hostnames whose DV cert may still be provisioning
+const probeAgent = new Agent({ connect: { rejectUnauthorized: false } })
 
 export const performanceRouter = Router()
 
@@ -17,6 +23,9 @@ performanceRouter.get("/probe", async (req: Request, res: Response) => {
     Pragma:
       "akamai-x-cache-on,akamai-x-cache-remote-on,akamai-x-check-cacheable,akamai-x-get-cache-key,akamai-x-get-true-cache-key,akamai-x-get-request-id",
   }
+  if (config.siteAuthB64) {
+    headers["Authorization"] = `Basic ${config.siteAuthB64}`
+  }
   if (bypassCache) {
     headers["Cache-Control"] = "no-cache"
   }
@@ -29,7 +38,11 @@ performanceRouter.get("/probe", async (req: Request, res: Response) => {
 
   try {
     const start = performance.now()
-    const response = await fetch(targetUrl, { headers })
+    const response = await fetch(targetUrl, {
+      headers,
+      // @ts-expect-error undici dispatcher is supported by Node.js fetch
+      dispatcher: probeAgent,
+    })
     const ttfb = performance.now() - start
     const body = await response.arrayBuffer()
     const total = performance.now() - start

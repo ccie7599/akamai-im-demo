@@ -16,4 +16,5 @@ export const config = {
   edgeworkerId: process.env.AKAMAI_EDGEWORKER_ID || "",
   cpCode: process.env.AKAMAI_CP_CODE || "",
   authToken: process.env.API_AUTH_TOKEN || "",
+  siteAuthB64: process.env.SITE_AUTH_B64 || "",
 }
