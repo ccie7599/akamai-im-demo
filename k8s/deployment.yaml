@@ -14,24 +14,37 @@ spec:
     metadata:
       labels:
         app: im-demo
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/role: "api"
+        vault.hashicorp.com/agent-inject-secret-config: "api/data/im-demo/config"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "api/data/im-demo/config" -}}
+          export API_AUTH_TOKEN={{ .Data.data.API_AUTH_TOKEN }}
+          export DS2_WEBHOOK_USERNAME={{ .Data.data.DS2_WEBHOOK_USERNAME }}
+          export DS2_WEBHOOK_PASSWORD={{ .Data.data.DS2_WEBHOOK_PASSWORD }}
+          {{- end }}
+        vault.hashicorp.com/agent-inject-secret-edgerc: "api/data/im-demo/edgerc"
+        vault.hashicorp.com/agent-inject-template-edgerc: |
+          {{- with secret "api/data/im-demo/edgerc" -}}
+          {{ .Data.data.content }}
+          {{- end }}
     spec:
+      serviceAccountName: app-vault-access
       imagePullSecrets:
         - name: harbor-creds
       containers:
         - name: im-demo
           image: harbor.harbor.svc.cluster.local/presales/im-demo:v2
+          command: ["/bin/sh", "-c"]
+          args: ["source /vault/secrets/config && exec node dist/index.js"]
           ports:
             - containerPort: 3001
               protocol: TCP
           envFrom:
             - configMapRef:
                 name: im-demo-config
-            - secretRef:
-                name: im-demo-secrets
-          volumeMounts:
-            - name: edgerc
-              mountPath: /etc/akamai
-              readOnly: true
           resources:
             requests:
               cpu: 100m
@@ -51,7 +64,3 @@ spec:
               port: 3001
             initialDelaySeconds: 5
             periodSeconds: 10
-      volumes:
-        - name: edgerc
-          secret:
-            secretName: edgerc

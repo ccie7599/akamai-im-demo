@@ -7,5 +7,5 @@ data:
   PORT: "3001"
   CORS_ORIGIN: "https://im-demo.connected-cloud.io"
   AKAMAI_PROPERTY_HOSTNAME: "im-demo.connected-cloud.io"
-  EDGERC_PATH: "/etc/akamai/.edgerc"
+  EDGERC_PATH: "/vault/secrets/edgerc"
   EDGERC_SECTION: "default"
