@@ -38,7 +38,7 @@ spec:
         - name: im-demo
           image: harbor.harbor.svc.cluster.local/presales/im-demo:v2
           command: ["/bin/sh", "-c"]
-          args: ["source /vault/secrets/config && exec node dist/index.js"]
+          args: [". /vault/secrets/config && exec node dist/index.js"]
           ports:
             - containerPort: 3001
               protocol: TCP
