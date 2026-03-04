@@ -9,3 +9,4 @@ data:
   AKAMAI_PROPERTY_HOSTNAME: "im-demo.connected-cloud.io"
   EDGERC_PATH: "/vault/secrets/edgerc"
   EDGERC_SECTION: "default"
+  AKAMAI_CP_CODE: "1966384"
