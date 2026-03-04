@@ -6,36 +6,29 @@ import { config } from "../config.js"
 export const ccuRouter = Router()
 
 async function ccuPurge(action: "invalidate" | "delete", urls: string[], network: string) {
-  // Try URL-based purge first
-  const urlResponse = await akamaiApiRequest(
-    "POST",
-    `/ccu/v3/${action}/url/${network}`,
-    { objects: urls }
-  )
-
-  // If URL purge returns 403 (unauthorized arl) and we have a CP code, fall back
-  if (urlResponse.statusCode === 403 && config.cpCode) {
+  // Use CP code purge if configured (more reliable than URL purge for newly provisioned properties)
+  if (config.cpCode) {
     const cpCode = parseInt(config.cpCode, 10)
-    const cpResponse = await akamaiApiRequest(
+    const response = await akamaiApiRequest(
       "POST",
       `/ccu/v3/${action}/cpcode/${network}`,
       { objects: [cpCode] }
     )
     return {
-      response: cpResponse,
-      method: "cpcode",
+      response,
       path: `/ccu/v3/${action}/cpcode/${network}`,
       body: { objects: [cpCode] },
     }
   }
 
-  if (urlResponse.statusCode >= 400) {
-    throw new Error(`CCU API error ${urlResponse.statusCode}: ${JSON.stringify(urlResponse.body)}`)
-  }
-
+  // Fall back to URL-based purge
+  const response = await akamaiApiRequest(
+    "POST",
+    `/ccu/v3/${action}/url/${network}`,
+    { objects: urls }
+  )
   return {
-    response: urlResponse,
-    method: "url",
+    response,
     path: `/ccu/v3/${action}/url/${network}`,
     body: { objects: urls },
   }
